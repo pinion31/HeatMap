@@ -8,25 +8,31 @@
 
       body {
         background-color: white;
+        box-shadow: 2px 2px;
+        display:flex;
+        flex-direction:column;
       }
+      
 
       .tooltip {
         font-weight: bold;
         text-align: center;
+        font-size:21px;
       }
 
       .graph rect {
-        fill: steelblue;
+         stroke-opacity:0;
       }
 
       .graph{
-        background-color: green;
+        background-color: white;
         margin:0 10%;
+        box-shadow: 5px 5px 10px grey;
       }
 
       .YAxisLabel {
         fill: black;
-        font: 15px sans-serif;
+        font: 25px sans-serif;
         font-weight: bold;
       }
 
@@ -36,9 +42,9 @@
         font-weight: bold;
       }
 
-
+      
       .axis text {
-         font: 10px sans-serif;
+         font: 15px sans-serif;
       }
 
       .axis path,
@@ -62,13 +68,14 @@
       }
 
       h1,h2 {
-        text-align: center;
+        text-align:center;
         color:black;
         font-size: 3em;
         font-family: sans-serif;
       }
 
       h2 {
+      
         font-size: 2em;
       }
 
@@ -86,6 +93,11 @@
   <script>
 
   var colors = {purple: '#5E4FA2', blue: '#3288BD', teal: '#66C2A5', lightblue:'#ABDDA4' , lightbrown:'#E6F598', cream:'#FFFFBF', beige:'#FEE08B', tan:'#FDAE61', orange:'#F46D43', pink:'#D53E4F', red:'#9E0142'};
+  var monthNames = ["January", "February", "March", "April", "May", "June",
+  "July", "August", "September", "October", "November", "December"
+  ];
+  
+  
 
   $(document).ready(function() {
 
@@ -96,28 +108,33 @@
 
         // values for chart dimensions
         var margin = {top: 20, right: 30, bottom: 30, left: 40};
-        var width = 700- margin.left - margin.right;
+        var width = 700 - margin.left - margin.right;
         var height = 500 - margin.top - margin.bottom;
 
         var axisWidth = width + margin.left + (margin.right * 2);
-
+        var xOffset = margin.left * 2.5;
+        
         var y = d3.scaleLinear()
           .range([height,1])
-          .domain([1,12]);
+          .domain([12,1]);
 
         var x = d3.scaleLinear()
           .range([0, axisWidth])
           .domain([1753,2015]);
 
+        //sets dimensions of graph
         var graph = d3.select("svg")
           .attr("width",width + margin.right + margin.left + margin.right + margin.left + 100)
-          .attr("height",height + margin.top + (margin.bottom * 2));
+          .attr("height",height + (margin.top*2) + (margin.bottom * 2) + 30);
 
         var xAxis = d3.axisBottom()
           .scale(x)
+          .ticks(13, ".4r");
 
         var yAxis = d3.axisLeft()
           .scale(y)
+          .tickFormat(function(x){
+            return monthNames[x-1]});
 
         var div = d3.select("body").append("div")
           .attr("class", "tooltip")
@@ -126,49 +143,109 @@
         var block = graph.selectAll("g")
           .data(result.monthlyVariance)
           .enter().append("g")
-          .attr("transform", function() {
-             return "translate(" + margin.left +"," + margin.top + ")";
+          .attr("transform", function() { //offset graph here
+             return "translate(" + xOffset +"," + 25 + ")";
           });
-
 
        block.append("rect")
           .attr("height", (height + margin.top + margin.bottom)/12)
           .attr("width", axisWidth/(2015-1753))
           .attr("x", function(d,i) { return x(result.monthlyVariance[i].year);})
-          .attr("y", function(d,i) { return y(result.monthlyVariance[i].month);});
-          //.style("fill:red");
+          .attr("y", function(d,i) { return y(result.monthlyVariance[i].month);})
+          .on('mouseover', function(d,i) {
+             dynamicColor = this.style.fill;
+             d3.select(this)
+              .style('fill', 'gray')
+            
+             div.transition()
+             .duration(200)
+             .style('opacity', .9);
 
+             div.html("<span class='tooltip'>" + result.monthlyVariance[i].year + " - " + 
+             monthNames[result.monthlyVariance[i].month - 1] + "</span> <br/>"  + 
+             "<span style='font-size:18px; font-weight:bold'>" + (result.baseTemperature + 
+             result.monthlyVariance[i].variance).toFixed(2) + "&#8451;" + "</span> <br/>" +
+             "<span style='font-size:15px'>" + result.monthlyVariance[i].variance.toFixed(2) + "&#8451;" + "</span>")
+             .style("left", (d3.event.pageX) + "px")
+             .style("top", (d3.event.pageY - 28) + "px")
+             .style("height", "75px")
+             .style("width", "185px")
+             .style("padding", "10px");
+             
+            })
+             .on('mouseout', function(d) {
+              d3.select(this)
+              .style('fill', dynamicColor)
+  
+              div.transition()
+              .duration(500)
+              .style("opacity", 0);
+            })
+          .style("fill", function(d,i) { return getTempColor(i, result); });
+          //.style("fill", colors.red);
 
 
         graph.append("g")
           .attr("class", "x axis")
-          .attr("transform", "translate(" + margin.left + "," + (height + (margin.top) + 5) + ")")
+          .attr("transform", "translate(" + xOffset + "," + (height + (margin.top * 2) + 28) + ")")
           .call(xAxis);
 
         graph.append("g")
           .attr("class", "y axis")
-          .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+          .attr("transform", "translate(" + (xOffset - 5) + "," + (margin.top + 25)  + ")")
           .call(yAxis);
 
         //yAxis Label
         graph.append("text")
           .attr("transform", "rotate(-90)")
-          .attr("y", (margin.left/2) - 5)
+          .attr("y", (margin.left/2) + 25)
           .attr("x",-(height + margin.top)/2)
           .style("text-anchor", "middle")
           .text("Months")
           .attr("class", "YAxisLabel");
 
-        //xAxis
+        //xAxis Label
         graph.append("text")
-          .attr("y",height + margin.top + margin.bottom + 15)
-          .attr("x",(width + margin.left)/2)
+          .attr("y",height + margin.top + margin.bottom + 65)
+          .attr("x",(width + (xOffset*2) + margin.right)/2)
           .style("text-anchor", "start")
           .text("Years")
           .attr("class", "YAxisLabel");
       },
 
     });
+    
+    //returns color to dispay for rect based on temperature data
+    function getTempColor(i, result) {
+      var temp = result.baseTemperature + result.monthlyVariance[i].variance
+      
+      switch(true) {
+        case (temp >= 12.7):
+          return  colors.red;
+        case (temp >= 11.6):
+          return  colors.pink;
+        case (temp >= 10.5):
+          return  colors.orange;
+        case (temp >= 9.4):
+          return  colors.tan;
+        case (temp >= 8.3):
+          return  colors.beige;
+        case (temp >= 7.2):
+          return  colors.cream;
+        case (temp >= 6.1):
+          return  colors.lightbrown;
+        case (temp >= 5):
+          return  colors.lightblue;
+        case (temp >= 3.9):
+          return  colors.teal;
+        case (temp >= 2.7):
+          return  colors.blue;
+        case (temp >= 0):
+          return  colors.purple;
+        default:
+          return colors.purple;
+      }
+    }
  });
   </script>
   </body>
