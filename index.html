@@ -8,7 +8,6 @@
 
       body {
         background-color: white;
-        box-shadow: 2px 2px;
         display:flex;
         flex-direction:column;
       }
@@ -17,7 +16,7 @@
       .tooltip {
         font-weight: bold;
         text-align: center;
-        font-size:21px;
+        font-size:15px;
       }
 
       .graph rect {
@@ -26,7 +25,7 @@
 
       .graph{
         background-color: white;
-        margin:0 10%;
+        margin:0 6%;
         box-shadow: 5px 5px 10px grey;
       }
 
@@ -108,10 +107,10 @@
 
         // values for chart dimensions
         var margin = {top: 20, right: 30, bottom: 30, left: 40};
-        var width = 700 - margin.left - margin.right;
+        var width = 500 - margin.left - margin.right;
         var height = 500 - margin.top - margin.bottom;
 
-        var axisWidth = width + margin.left + (margin.right * 2);
+        var axisWidth = width + (margin.left*2) + (margin.right * 2) + 75;
         var xOffset = margin.left * 2.5;
         
         var y = d3.scaleLinear()
@@ -124,7 +123,7 @@
 
         //sets dimensions of graph
         var graph = d3.select("svg")
-          .attr("width",width + margin.right + margin.left + margin.right + margin.left + 100)
+          .attr("width",width + margin.right + margin.left + margin.right + margin.left + 200)
           .attr("height",height + (margin.top*2) + (margin.bottom * 2) + 30);
 
         var xAxis = d3.axisBottom()
@@ -139,6 +138,7 @@
         var div = d3.select("body").append("div")
           .attr("class", "tooltip")
           .style("opacity", 0);
+          
 
         var block = graph.selectAll("g")
           .data(result.monthlyVariance)
@@ -163,14 +163,15 @@
 
              div.html("<span class='tooltip'>" + result.monthlyVariance[i].year + " - " + 
              monthNames[result.monthlyVariance[i].month - 1] + "</span> <br/>"  + 
-             "<span style='font-size:18px; font-weight:bold'>" + (result.baseTemperature + 
+             "<span style='font-size:12px; font-weight:bold'>" + (result.baseTemperature + 
              result.monthlyVariance[i].variance).toFixed(2) + "&#8451;" + "</span> <br/>" +
-             "<span style='font-size:15px'>" + result.monthlyVariance[i].variance.toFixed(2) + "&#8451;" + "</span>")
+             "<span style='font-size:10px'>" + result.monthlyVariance[i].variance.toFixed(2) + "&#8451;" + "</span>")
              .style("left", (d3.event.pageX) + "px")
              .style("top", (d3.event.pageY - 28) + "px")
-             .style("height", "75px")
-             .style("width", "185px")
-             .style("padding", "10px");
+             .style("height", "60px")
+             .style("width", "130px")
+             .style("padding", "5px")
+             .style("padding-top", "15px");
              
             })
              .on('mouseout', function(d) {
@@ -207,7 +208,7 @@
         //xAxis Label
         graph.append("text")
           .attr("y",height + margin.top + margin.bottom + 65)
-          .attr("x",(width + (xOffset*2) + margin.right)/2)
+          .attr("x",(width + (xOffset*2) + (margin.right*2))/1.75)
           .style("text-anchor", "start")
           .text("Years")
           .attr("class", "YAxisLabel");
