@@ -11,7 +11,7 @@
         display:flex;
         flex-direction:column;
       }
-      
+
 
       .tooltip {
         font-weight: bold;
@@ -41,7 +41,7 @@
         font-weight: bold;
       }
 
-      
+
       .axis text {
          font: 15px sans-serif;
       }
@@ -74,7 +74,7 @@
       }
 
       h2 {
-      
+
         font-size: 2em;
       }
 
@@ -95,8 +95,8 @@
   var monthNames = ["January", "February", "March", "April", "May", "June",
   "July", "August", "September", "October", "November", "December"
   ];
-  
-  
+
+
 
   $(document).ready(function() {
 
@@ -107,12 +107,12 @@
 
         // values for chart dimensions
         var margin = {top: 20, right: 30, bottom: 30, left: 40};
-        var width = 500 - margin.left - margin.right;
+        var width = screen.width/1.5 - (margin.left *2) - (margin.right * 2);
         var height = 500 - margin.top - margin.bottom;
 
         var axisWidth = width + (margin.left*2) + (margin.right * 2) + 75;
         var xOffset = margin.left * 2.5;
-        
+
         var y = d3.scaleLinear()
           .range([height,1])
           .domain([12,1]);
@@ -138,7 +138,7 @@
         var div = d3.select("body").append("div")
           .attr("class", "tooltip")
           .style("opacity", 0);
-          
+
 
         var block = graph.selectAll("g")
           .data(result.monthlyVariance)
@@ -156,14 +156,14 @@
              dynamicColor = this.style.fill;
              d3.select(this)
               .style('fill', 'gray')
-            
+
              div.transition()
              .duration(200)
              .style('opacity', .9);
 
-             div.html("<span class='tooltip'>" + result.monthlyVariance[i].year + " - " + 
-             monthNames[result.monthlyVariance[i].month - 1] + "</span> <br/>"  + 
-             "<span style='font-size:12px; font-weight:bold'>" + (result.baseTemperature + 
+             div.html("<span class='tooltip'>" + result.monthlyVariance[i].year + " - " +
+             monthNames[result.monthlyVariance[i].month - 1] + "</span> <br/>"  +
+             "<span style='font-size:12px; font-weight:bold'>" + (result.baseTemperature +
              result.monthlyVariance[i].variance).toFixed(2) + "&#8451;" + "</span> <br/>" +
              "<span style='font-size:10px'>" + result.monthlyVariance[i].variance.toFixed(2) + "&#8451;" + "</span>")
              .style("left", (d3.event.pageX) + "px")
@@ -172,12 +172,12 @@
              .style("width", "130px")
              .style("padding", "5px")
              .style("padding-top", "15px");
-             
+
             })
              .on('mouseout', function(d) {
               d3.select(this)
               .style('fill', dynamicColor)
-  
+
               div.transition()
               .duration(500)
               .style("opacity", 0);
@@ -215,11 +215,11 @@
       },
 
     });
-    
+
     //returns color to dispay for rect based on temperature data
     function getTempColor(i, result) {
       var temp = result.baseTemperature + result.monthlyVariance[i].variance
-      
+
       switch(true) {
         case (temp >= 12.7):
           return  colors.red;
