@@ -155,7 +155,7 @@
           .on('mouseover', function(d,i) {
              dynamicColor = this.style.fill;
              d3.select(this)
-              .style('fill', 'gray')
+              .style('fill', 'blue')
 
              div.transition()
              .duration(200)
@@ -166,7 +166,7 @@
              "<span style='font-size:12px; font-weight:bold'>" + (result.baseTemperature +
              result.monthlyVariance[i].variance).toFixed(2) + "&#8451;" + "</span> <br/>" +
              "<span style='font-size:10px'>" + result.monthlyVariance[i].variance.toFixed(2) + "&#8451;" + "</span>")
-             .style("left", (d3.event.pageX) + "px")
+             .style("left", (d3.event.pageX + 10) + "px")
              .style("top", (d3.event.pageY - 28) + "px")
              .style("height", "60px")
              .style("width", "130px")
